@@ -35,9 +35,17 @@ namespace Framework.Data
                 if (entityType == null)
                     continue;
 
-                var insts = EntityTypeConfigurationFactory.CreateNewInstances(entityType.GetInterfaces());                
-                foreach(var inst in insts)
-                    modelBuilder.ApplyConfiguration(inst);                                
+                foreach(var intf in entityType.GetInterfaces())
+                {
+                    if (!typeof(IEntity).IsAssignableFrom(intf))
+                        continue;
+                                        
+                    var confInstance = EntityTypeConfigurationFactory.CreateNewInstance(intf);
+                    var genType = entityType.MakeGenericType();                    
+                    var appConfMtd = modelBuilder.GetType().GetMethod("ApplyConfiguration", 1, new[] { genType })?
+                                            .MakeGenericMethod(genType);
+                    appConfMtd.Invoke(modelBuilder, new object[] { confInstance });
+                }                
             }
 
             // 2nd : Assembly's configurations 
