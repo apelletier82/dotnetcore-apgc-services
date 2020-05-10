@@ -10,6 +10,7 @@ namespace Framework.Data.EntityTypeConfigurations
         public void Configure(EntityTypeBuilder<TEntity> builder)
         {
             builder.OwnsOne(o => o.Deletion);
+            builder.HasIndex(i => i.Deleted);
         }
     }
 }
