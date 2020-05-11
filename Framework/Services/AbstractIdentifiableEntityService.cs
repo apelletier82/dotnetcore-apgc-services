@@ -2,6 +2,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Framework.Data;
 using Framework.Entities;
+using Framework.Exceptions;
 using Framework.Services.Abstract;
 
 namespace Framework.Services
@@ -11,16 +12,28 @@ namespace Framework.Services
         where TEntity : class, IIdentifiable
     {
         public AbstractIdentifiableEntityService(CustomDBContext dbContext) : base(dbContext)
-        { }
-        
-        public virtual bool Delete(long id)
-            => Delete(Get(id));        
-
-        public virtual async Task<bool> DeleteAsync(long id, CancellationToken cancellationToken = default)
-            => await DeleteAsync(await GetAsync(id, cancellationToken), cancellationToken);        
+        { }             
 
         public abstract TEntity Get(long id);
 
-        public abstract Task<TEntity> GetAsync(long id, CancellationToken cancellationToken = default);        
+        public abstract Task<TEntity> GetAsync(long id, CancellationToken cancellationToken = default);  
+
+        public virtual bool Delete(long id)
+        {
+            var inst = Get(id); 
+            if (inst == null)
+                throw new EntityIdentityNotFoundException(id, typeof(TEntity).Name, "Not found");
+            
+            return Delete(inst);
+        }
+
+        public virtual async Task<bool> DeleteAsync(long id, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            var inst = await GetAsync(id, cancellationToken);
+            if (inst == null)
+                throw new EntityIdentityNotFoundException(id, typeof(TEntity).Name, "Not found");
+            
+            return await DeleteAsync(inst, cancellationToken);
+        }              
     }
 }

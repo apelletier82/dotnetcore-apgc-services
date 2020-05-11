@@ -8,7 +8,7 @@ using Framework.Services.Abstract;
 namespace Framework.Services
 {
     public abstract class AbstractEntityService<TEntity> :
-        IGetEntityService<TEntity>, IAddEntityService<TEntity>, IUpdateEntityService<TEntity>, IDeleteEntityService<TEntity>
+        IAddEntityService<TEntity>, IUpdateEntityService<TEntity>, IDeleteEntityService<TEntity>
         where TEntity : class, IEntity
     {
         protected CustomDBContext DBContext { get; private set; }
@@ -44,11 +44,7 @@ namespace Framework.Services
             var result = DBContext.Remove<TEntity>(instance);
             await DBContext.SaveChangesAsync(true, cancellationToken);
             return result != null;
-        }
-
-        public abstract IEnumerable<TEntity> GetAll();
-
-        public abstract Task<IEnumerable<TEntity>> GetAllAsync(CancellationToken cancellation = default);
+        }        
 
         public virtual TEntity Update(TEntity instance)
         {            

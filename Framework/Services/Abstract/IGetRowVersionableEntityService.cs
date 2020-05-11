@@ -4,7 +4,7 @@ using Framework.Entities;
 
 namespace Framework.Services.Abstract
 {
-    public interface IGetRowVersionableEntityService<TEntity>: IGetEntityService<TEntity>
+    public interface IGetRowVersionableEntityService<TEntity>
         where TEntity: class, IIdentifiable, IRowVersionable 
     {
         TEntity FindRowVersion(long id, byte[] rowVersion);

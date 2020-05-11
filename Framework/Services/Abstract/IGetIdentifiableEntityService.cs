@@ -4,7 +4,7 @@ using Framework.Entities;
 
 namespace Framework.Services.Abstract
 {
-    public interface IGetIdentifiableEntityService<TEntity>: IGetEntityService<TEntity>
+    public interface IGetIdentifiableEntityService<TEntity>
         where TEntity: class, IIdentifiable
     {
         TEntity Get(long id);
