@@ -1,6 +1,6 @@
 namespace Framework.Models
 {
-    public interface ISimpleUser
+    public interface IIdentityUser
     {
         string Username { get; }
     }

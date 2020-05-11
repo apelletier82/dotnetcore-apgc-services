@@ -8,9 +8,9 @@ namespace Framework.Data.EntityTypeConfigurations
         where TEntity : class, IAuditable
     {
         public void Configure(EntityTypeBuilder<TEntity> builder)
-        {
+        {            
             builder.OwnsOne(o => o.Creation);
-            builder.OwnsOne(o => o.LastChange);
+            builder.OwnsOne(o => o.LastChange);        
         }
     }
 }

@@ -5,7 +5,7 @@ namespace Framework.Entities.Owned
     {
         public string User { get; private set; }
         public DateTimeOffset Date { get; private set; }
-        public void DoAudit(string auditUser)
+        public virtual void DoAudit(string auditUser)
         {
             User = auditUser;
             Date = DateTimeOffset.Now;

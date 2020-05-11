@@ -11,7 +11,7 @@ namespace Framework.Data.DBContexts
         private ILogger<CustomTenanciableDBContext> _logger;
         private ITenant _tenant;
 
-        public CustomTenanciableDBContext(ITenant tenant, ISimpleUser simpleUser, ILoggerFactory loggerFactory) : base(simpleUser, loggerFactory)            
+        public CustomTenanciableDBContext(ITenant tenant, IIdentityUser identityUser, ILoggerFactory loggerFactory) : base(identityUser, loggerFactory)            
         {
             _tenant = tenant;
             _logger = loggerFactory.CreateLogger<CustomTenanciableDBContext>();

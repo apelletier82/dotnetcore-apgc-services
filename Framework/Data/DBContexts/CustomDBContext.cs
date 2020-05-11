@@ -6,17 +6,19 @@ using Framework.Models;
 using Microsoft.Extensions.Logging;
 using System.Threading.Tasks;
 using Framework.Extensions;
+using Framework.Data.EntityTypeConfigurations;
+using Framework.Entities.Owned;
 
 namespace Framework.Data
 {
     public abstract class CustomDBContext : DbContext
     {    
-        ISimpleUser _simpleUser;
+        IIdentityUser _identityUser;
         ILogger<CustomDBContext> _logger;       
         
-        public CustomDBContext(ISimpleUser simpleUser, ILoggerFactory loggerFactory)
+        public CustomDBContext(IIdentityUser identityUser, ILoggerFactory loggerFactory)
         {
-            _simpleUser = simpleUser;
+            _identityUser = identityUser;
             _logger = loggerFactory.CreateLogger<CustomDBContext>();
         }
 
@@ -30,9 +32,12 @@ namespace Framework.Data
             {
                 IAuditable ent = (IAuditable)entry.Entity;
                 if (entry.State == EntityState.Added)
-                    ent.Creation.DoAudit(_simpleUser.Username);
+                {
+                    ent.Creation.DoAudit(_identityUser.Username);
+                    ent.LastChange.DoAudit(_identityUser.Username);
+                }
                 else if (entry.State == EntityState.Modified)
-                    ent.LastChange.DoAudit(_simpleUser.Username);
+                    ent.LastChange.DoAudit(_identityUser.Username);
             }                                                
         }
 
@@ -41,7 +46,7 @@ namespace Framework.Data
             foreach(var entry in ChangeTracker.Entries().Where(e => (e is ISoftDeletable) && (e.State == EntityState.Deleted)))
             {
                 ISoftDeletable ent = (ISoftDeletable)entry.Entity;
-                ent.Delete(_simpleUser.Username);
+                ent.Delete(_identityUser.Username);
                 entry.State = EntityState.Modified;                
             }
         }
@@ -66,6 +71,7 @@ namespace Framework.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.ApplyConfiguration<Audit>(new AuditEntityTypeConfiguration());
             modelBuilder.ApplyConfigurationFromInterfacedEntites(this);
             modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
         }
