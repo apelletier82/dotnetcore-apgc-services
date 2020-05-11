@@ -7,12 +7,20 @@ using Framework.Services.Abstract;
 
 namespace Framework.Services
 {
+    /// <summary>
+    /// Abstract class managing C, U, D operations on Entities
+    /// </summary>
+    /// <typeparam name="TEntity">Class, IEntity</typeparam>
     public abstract class AbstractEntityService<TEntity> :
         IAddEntityService<TEntity>, IUpdateEntityService<TEntity>, IDeleteEntityService<TEntity>
         where TEntity : class, IEntity
     {
         protected CustomDBContext DBContext { get; private set; }
 
+        /// <summary>
+        /// DI Constuctor 
+        /// </summary>
+        /// <param name="dbContext">Custom Data store</param>
         public AbstractEntityService(CustomDBContext dbContext)
         {
             DBContext = dbContext;

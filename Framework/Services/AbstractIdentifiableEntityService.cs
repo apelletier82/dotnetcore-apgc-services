@@ -7,6 +7,10 @@ using Framework.Services.Abstract;
 
 namespace Framework.Services
 {
+    /// <summary>
+    /// Asbtract class managing C, U, D operation on Identifiable Entities
+    /// </summary>
+    /// <typeparam name="TEntity">Class, IIdentifiable</typeparam>
     public abstract class AbstractIdentifiableEntityService<TEntity> : AbstractEntityService<TEntity>,
         IGetIdentifiableEntityService<TEntity>, IDeleteIdentifiableEntityService<TEntity>
         where TEntity : class, IIdentifiable

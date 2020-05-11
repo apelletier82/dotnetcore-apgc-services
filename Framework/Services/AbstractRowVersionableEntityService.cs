@@ -7,6 +7,10 @@ using Framework.Exceptions;
 
 namespace Framework.Services.Abstract
 {
+    /// <summary>
+    /// Abstract class managing C, U, D operations on RowVersionable Entities 
+    /// </summary>
+    /// <typeparam name="TEntity">class, IIdentifiable, IRowVersionable</typeparam>
     public abstract class AbstractRowVersionableEntityService<TEntity> : AbstractIdentifiableEntityService<TEntity>, 
         IGetRowVersionableEntityService<TEntity>
         where TEntity : class, IIdentifiable, IRowVersionable
