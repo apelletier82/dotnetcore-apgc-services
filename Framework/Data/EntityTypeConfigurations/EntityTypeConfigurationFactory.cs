@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using Framework.Entities;
 using Framework.Models;
 
@@ -38,9 +37,9 @@ namespace Framework.Data.EntityTypeConfigurations
         {
             if(!typeof(ITenanciable).IsAssignableFrom(entityType)) 
                 throw new ArgumentException("entityType is not assignable from ITenanciable");
-
-            var constructedType = getConstructedType(typeof(CustomTenanciableEntityTypeConfiguration<>), entityType);
-            return Activator.CreateInstance(constructedType, new object[]{ tenant}) as CustomAbstractEntityTypeConfiguration;
+            
+            return Activator.CreateInstance(getConstructedType(typeof(CustomTenanciableEntityTypeConfiguration<>), entityType), 
+                new object[]{ tenant}) as CustomAbstractEntityTypeConfiguration;
         }        
     }
 }

@@ -8,13 +8,14 @@ using System.Threading.Tasks;
 using Framework.Extensions;
 using Framework.Data.EntityTypeConfigurations;
 using Framework.Entities.Owned;
+using System.Threading;
 
 namespace Framework.Data
 {
     public abstract class CustomDBContext : DbContext
     {    
-        IIdentityUser _identityUser;
-        ILogger<CustomDBContext> _logger;       
+        private IIdentityUser _identityUser;
+        private ILogger<CustomDBContext> _logger;       
         
         public CustomDBContext(IIdentityUser identityUser, ILoggerFactory loggerFactory)
         {
@@ -23,33 +24,28 @@ namespace Framework.Data
         }
 
         private void applyAuditToChangeTrackerEntries()
-        {
-            foreach(var entry in ChangeTracker
-                                .Entries()
-                                .Where(e => ((e is IAuditable) &&
-                                            (e.State == EntityState.Added || e.State == EntityState.Modified)))
-                    )
-            {
-                IAuditable ent = (IAuditable)entry.Entity;
-                if (entry.State == EntityState.Added)
-                {
-                    ent.Creation.DoAudit(_identityUser.Username);
-                    ent.LastChange.DoAudit(_identityUser.Username);
-                }
-                else if (entry.State == EntityState.Modified)
-                    ent.LastChange.DoAudit(_identityUser.Username);
-            }                                                
-        }
+            => ChangeTracker.Entries()
+                .Where(e => ((e is IAuditable) &&
+                            (e.State == EntityState.Added || e.State == EntityState.Modified)))
+                .ToList()
+                .ForEach(entry => 
+                    {
+                        var ent = (IAuditable)entry.Entity;
+                        if (entry.State == EntityState.Added)                        
+                            ent.Creation.DoAudit(_identityUser.Username);                                       
+                        // log last change everytime 
+                        ent.LastChange.DoAudit(_identityUser.Username);
+                    });                                                        
 
         private void applyDeletionToChangeTrackerEntries()
-        {
-            foreach(var entry in ChangeTracker.Entries().Where(e => (e is ISoftDeletable) && (e.State == EntityState.Deleted)))
-            {
-                ISoftDeletable ent = (ISoftDeletable)entry.Entity;
-                ent.Delete(_identityUser.Username);
-                entry.State = EntityState.Modified;                
-            }
-        }
+            => ChangeTracker.Entries()
+                .Where(e => (e is ISoftDeletable) && (e.State == EntityState.Deleted))
+                .ToList()
+                .ForEach(item => 
+                    {                        
+                        ((ISoftDeletable)item.Entity).Delete(_identityUser.Username);
+                        item.State = EntityState.Modified; 
+                    });                         
 
         private void applyModificationToChangeTrackerEntities()
         {
@@ -63,7 +59,7 @@ namespace Framework.Data
             return base.SaveChanges(acceptAllChangesOnSuccess);
         }
 
-        public override async Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
+        public override async Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess, CancellationToken cancellationToken = default(CancellationToken))
         {   
             applyModificationToChangeTrackerEntities();
             return await base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken);

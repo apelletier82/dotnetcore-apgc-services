@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Framework.Data;
@@ -15,16 +14,14 @@ namespace Framework.Services
         IAddEntityService<TEntity>, IUpdateEntityService<TEntity>, IDeleteEntityService<TEntity>
         where TEntity : class, IEntity
     {
+        /// <summary>
+        /// Data store 
+        /// </summary
+        /// <value></value>
         protected CustomDBContext DBContext { get; private set; }
 
-        /// <summary>
-        /// DI Constuctor 
-        /// </summary>
-        /// <param name="dbContext">Custom Data store</param>
         public AbstractEntityService(CustomDBContext dbContext)
-        {
-            DBContext = dbContext;
-        }
+            => DBContext = dbContext;        
 
         public virtual TEntity Add(TEntity instance)
         {
