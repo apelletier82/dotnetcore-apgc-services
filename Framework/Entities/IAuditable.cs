@@ -1,4 +1,3 @@
-using System;
 using Framework.Entities.Owned;
 
 namespace Framework.Entities

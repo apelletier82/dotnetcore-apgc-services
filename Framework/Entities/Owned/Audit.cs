@@ -1,4 +1,5 @@
 using System;
+
 namespace Framework.Entities.Owned
 {
     public class Audit

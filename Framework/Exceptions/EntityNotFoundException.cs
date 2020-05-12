@@ -1,4 +1,5 @@
 using System;
+
 namespace Framework.Exceptions
 {
     public class EntityNotFoundException: Exception
