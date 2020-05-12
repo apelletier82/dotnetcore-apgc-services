@@ -11,14 +11,12 @@ namespace Framework.Data.EntityTypeConfigurations
         private ITenant _tenant;
 
         public CustomTenanciableEntityTypeConfiguration(ITenant tenant)
-        {
-            _tenant = tenant;
-        }
+            => _tenant = tenant;        
 
         public void Configure(EntityTypeBuilder<TEntity> builder)
         {
             builder.HasQueryFilter(q => q.TenantID == _tenant.Id);
-            builder.HasIndex(i => i.TenantID);
+            builder.HasIndex(i => i.TenantID);            
         }
     }
 }

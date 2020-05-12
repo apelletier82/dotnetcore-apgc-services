@@ -8,10 +8,8 @@ namespace Framework.Data.EntityTypeConfigurations
         where TEntity : class, IRowVersionable
     {
         public void Configure(EntityTypeBuilder<TEntity> builder)
-        {
-            builder.Property(p => p.RowVersion)
-                .IsRowVersion()
-                .IsRequired();
-        }
+            => builder.Property(p => p.RowVersion)
+                    .IsRowVersion()
+                    .IsRequired();
     }
 }

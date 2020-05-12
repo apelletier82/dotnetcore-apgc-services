@@ -7,8 +7,6 @@ namespace Framework.Data.EntityTypeConfigurations
     public class AuditEntityTypeConfiguration : IEntityTypeConfiguration<Audit>
     {
         public void Configure(EntityTypeBuilder<Audit> builder)
-        {
-            builder.Property(p => p.User).HasMaxLength(60);            
-        }
+            => builder.Property(p => p.User).HasMaxLength(60);        
     }
 }
