@@ -4,7 +4,7 @@ using Framework.Data;
 using Framework.Entities;
 using Framework.Exceptions;
 
-namespace Framework.Services.Abstract
+namespace Framework.Services.Interfaces
 {
     /// <summary>
     /// Abstract class managing C, U, D operations on RowVersionable Entities 
@@ -14,7 +14,7 @@ namespace Framework.Services.Abstract
         IGetRowVersionableEntityService<TEntity>
         where TEntity : class, IIdentifiable, IRowVersionable
     {
-        public AbstractRowVersionableEntityService(CustomDBContext dbContext): base(dbContext) 
+        public AbstractRowVersionableEntityService(AbstractDBContext dbContext): base(dbContext) 
         { }
         
         public abstract TEntity FindRowVersion(long id, byte[] rowVersion);

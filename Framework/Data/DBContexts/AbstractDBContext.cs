@@ -12,15 +12,15 @@ using System.Threading;
 
 namespace Framework.Data
 {
-    public abstract class CustomDBContext : DbContext
+    public abstract class AbstractDBContext : DbContext
     {    
         private IIdentityUser _identityUser;
-        private ILogger<CustomDBContext> _logger;       
+        private ILogger<AbstractDBContext> _logger;       
         
-        public CustomDBContext(IIdentityUser identityUser, ILoggerFactory loggerFactory)
+        public AbstractDBContext(IIdentityUser identityUser, ILoggerFactory loggerFactory)
         {
             _identityUser = identityUser;
-            _logger = loggerFactory.CreateLogger<CustomDBContext>();
+            _logger = loggerFactory.CreateLogger<AbstractDBContext>();
         }
 
         private void applyAuditToChangeTrackerEntries()
@@ -67,8 +67,15 @@ namespace Framework.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            _logger.LogDebug("OnModelCreating");
+            
+            _logger.LogDebug("ApplyConfiguration<Audit>");
             modelBuilder.ApplyConfiguration<Audit>(new AuditEntityTypeConfiguration());
+            
+            _logger.LogDebug("ApplyConfigurationFromInterfacedEntites");
             modelBuilder.ApplyConfigurationFromInterfacedEntites(this);
+
+            _logger.LogDebug("ApplyConfigurationsFromAssembly");
             modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
         }
     }

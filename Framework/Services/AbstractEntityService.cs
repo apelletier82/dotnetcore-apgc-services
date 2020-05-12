@@ -2,7 +2,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Framework.Data;
 using Framework.Entities;
-using Framework.Services.Abstract;
+using Framework.Services.Interfaces;
 
 namespace Framework.Services
 {
@@ -18,9 +18,9 @@ namespace Framework.Services
         /// Data store 
         /// </summary
         /// <value></value>
-        protected CustomDBContext DBContext { get; private set; }
+        protected virtual AbstractDBContext DBContext { get; private set; }
 
-        public AbstractEntityService(CustomDBContext dbContext)
+        public AbstractEntityService(AbstractDBContext dbContext)
             => DBContext = dbContext;        
 
         public virtual TEntity Add(TEntity instance)

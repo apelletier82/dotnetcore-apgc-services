@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using Framework.Data;
 using Framework.Entities;
 using Framework.Exceptions;
-using Framework.Services.Abstract;
+using Framework.Services.Interfaces;
 
 namespace Framework.Services
 {
@@ -15,7 +15,7 @@ namespace Framework.Services
         IGetIdentifiableEntityService<TEntity>, IDeleteIdentifiableEntityService<TEntity>
         where TEntity : class, IIdentifiable
     {
-        public AbstractIdentifiableEntityService(CustomDBContext dbContext) : base(dbContext)
+        public AbstractIdentifiableEntityService(AbstractDBContext dbContext) : base(dbContext)
         { }             
 
         public abstract TEntity Get(long id);

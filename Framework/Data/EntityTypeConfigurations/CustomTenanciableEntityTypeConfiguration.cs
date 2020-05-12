@@ -16,7 +16,8 @@ namespace Framework.Data.EntityTypeConfigurations
         public void Configure(EntityTypeBuilder<TEntity> builder)
         {
             builder.HasQueryFilter(q => q.TenantID == _tenant.Id);
-            builder.HasIndex(i => i.TenantID);            
+            builder.HasIndex(i => i.TenantID);
+            builder.Property(p => p.TenantID).HasDefaultValue(_tenant.Id);       
         }
     }
 }

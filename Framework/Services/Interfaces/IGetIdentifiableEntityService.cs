@@ -2,7 +2,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Framework.Entities;
 
-namespace Framework.Services.Abstract
+namespace Framework.Services.Interfaces
 {
     public interface IGetIdentifiableEntityService<TEntity>
         where TEntity: class, IIdentifiable
