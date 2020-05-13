@@ -8,20 +8,24 @@ using Framework.Services.Interfaces;
 namespace Framework.Services
 {
     /// <summary>
-    /// Asbtract class managing C, U, D operation on Identifiable Entities
-    /// </summary>
+    /// <para>Asbtract class managing C, U, D operation on Identifiable Entities.</para>
+    /// <para>Check that entity id exists in datastore before updating / deleting.</para>
+    /// </summary>    
     /// <typeparam name="TEntity">Class, IIdentifiable</typeparam>
-    public abstract class AbstractIdentifiableEntityService<TEntity> : AbstractEntityService<TEntity>,
+    /// <typeparam name="TDBContext">Class of AbstractDBContext</typeparam>
+    public abstract class AbstractIdentifiableEntityService<TEntity, TDBContext> : AbstractEntityService<TEntity, TDBContext>,
         IGetIdentifiableEntityService<TEntity>, IDeleteIdentifiableEntityService<TEntity>
         where TEntity : class, IIdentifiable
+        where TDBContext: AbstractDBContext
     {
-        public AbstractIdentifiableEntityService(AbstractDBContext dbContext) : base(dbContext)
+        public AbstractIdentifiableEntityService(TDBContext dbContext) : base(dbContext)
         { }             
 
         public abstract TEntity Get(long id);
 
         public abstract Task<TEntity> GetAsync(long id, CancellationToken cancellationToken = default);  
 
+        /// <exception cref="Framework.Exceptions.EntityIdentityNotFoundException">Entity's Id not found in the DataStore</exception>
         public virtual bool Delete(long id)
         {
             var inst = Get(id); 
@@ -30,7 +34,8 @@ namespace Framework.Services
             
             return Delete(inst);
         }
-
+        
+        /// <exception cref="Framework.Exceptions.EntityIdentityNotFoundException">Entity's Id not found in the DataStore</exception>
         public virtual async Task<bool> DeleteAsync(long id, CancellationToken cancellationToken = default(CancellationToken))
         {
             var inst = await GetAsync(id, cancellationToken);

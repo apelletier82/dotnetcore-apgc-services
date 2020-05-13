@@ -10,17 +10,18 @@ namespace Framework.Services
     /// Abstract class managing C, U, D operations on Entities
     /// </summary>
     /// <typeparam name="TEntity">Class, IEntity</typeparam>
-    public abstract class AbstractEntityService<TEntity> :
+    /// <typeparam name="TDBContext">Class of AbstractDBContext</typeparam>
+    public abstract class AbstractEntityService<TEntity, TDBContext> :
         IAddEntityService<TEntity>, IUpdateEntityService<TEntity>, IDeleteEntityService<TEntity>
         where TEntity : class, IEntity
+        where TDBContext: AbstractDBContext
     {
         /// <summary>
         /// Data store 
-        /// </summary
-        /// <value></value>
-        protected virtual AbstractDBContext DBContext { get; private set; }
+        /// </summary>        
+        protected virtual TDBContext DBContext { get; private set; }
 
-        public AbstractEntityService(AbstractDBContext dbContext)
+        public AbstractEntityService(TDBContext dbContext)
             => DBContext = dbContext;        
 
         public virtual TEntity Add(TEntity instance)
