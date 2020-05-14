@@ -21,7 +21,7 @@ namespace Framework.Services
         public AbstractIdentifiableEntityService(TDBContext dbContext) : base(dbContext)
         { }             
 
-        public abstract TEntity Get(long id);
+        public abstract TEntity Get(long id);        
 
         public abstract Task<TEntity> GetAsync(long id, CancellationToken cancellationToken = default);  
 

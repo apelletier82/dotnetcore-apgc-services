@@ -8,9 +8,9 @@ namespace Framework.Data.EntityTypeConfigurations
         where TEntity : class, IAuditable
     {
         public void Configure(EntityTypeBuilder<TEntity> builder)
-        {            
-            builder.OwnsOne(o => o.Creation);
-            builder.OwnsOne(o => o.LastChange);        
+        {
+            builder.OwnsOne(o => o.Creation).Property(p => p.User).HasMaxLength(60);
+            builder.OwnsOne(o => o.LastChange).Property(p => p.User).HasMaxLength(60);        
         }
     }
 }

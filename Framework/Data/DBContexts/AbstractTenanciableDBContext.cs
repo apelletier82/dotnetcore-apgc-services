@@ -12,7 +12,8 @@ namespace Framework.Data.DBContexts
         private ILogger<AbstractTenanciableDBContext> _logger;
         private ITenant _tenant;
 
-        public AbstractTenanciableDBContext(ITenant tenant, IIdentityUser identityUser, ILoggerFactory loggerFactory) : base(identityUser, loggerFactory)            
+        public AbstractTenanciableDBContext(DbContextOptions options, ITenant tenant, IIdentityUser identityUser, ILoggerFactory loggerFactory) 
+            : base(options, identityUser, loggerFactory)
         {
             _tenant = tenant;
             _logger = loggerFactory.CreateLogger<AbstractTenanciableDBContext>();
@@ -21,9 +22,12 @@ namespace Framework.Data.DBContexts
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             _logger.LogDebug("OnModelCreating");
+            
             _logger.LogDebug("ApplyConfigurationFromInterfacedEntites by tenant");
-            modelBuilder.ApplyConfigurationFromInterfacedEntites(this, _tenant);
-            base.OnModelCreating(modelBuilder);
+            modelBuilder.ApplyConfigurationFromInterfacedEntites(this, _tenant);  
+
+            _logger.LogDebug("base.OnModelCreating");
+            base.OnModelCreating(modelBuilder);                      
         }
     }
 }

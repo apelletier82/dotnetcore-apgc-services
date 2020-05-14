@@ -9,8 +9,8 @@ namespace Framework.Data.EntityTypeConfigurations
     {
         public void Configure(EntityTypeBuilder<TEntity> builder)
         {
-            builder.OwnsOne(o => o.Deletion);
-            builder.HasIndex(i => i.Deleted);
+            builder.OwnsOne(o => o.Deletion).Property(p => p.User).HasMaxLength(60);
+            builder.HasIndex(i => i.Deleted);            
         }
     }
 }

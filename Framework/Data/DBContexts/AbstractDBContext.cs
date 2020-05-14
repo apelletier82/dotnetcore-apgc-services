@@ -17,7 +17,8 @@ namespace Framework.Data
         private IIdentityUser _identityUser;
         private ILogger<AbstractDBContext> _logger;       
         
-        public AbstractDBContext(IIdentityUser identityUser, ILoggerFactory loggerFactory)
+        public AbstractDBContext(DbContextOptions options, IIdentityUser identityUser, ILoggerFactory loggerFactory)
+            :base(options)
         {
             _identityUser = identityUser;
             _logger = loggerFactory.CreateLogger<AbstractDBContext>();
@@ -68,9 +69,6 @@ namespace Framework.Data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             _logger.LogDebug("OnModelCreating");
-            
-            _logger.LogDebug("ApplyConfiguration<Audit>");
-            modelBuilder.ApplyConfiguration<Audit>(new AuditEntityTypeConfiguration());
             
             _logger.LogDebug("ApplyConfigurationFromInterfacedEntites");
             modelBuilder.ApplyConfigurationFromInterfacedEntites(this);
