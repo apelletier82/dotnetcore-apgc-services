@@ -23,11 +23,11 @@ namespace Framework.Data.DBContexts
         {
             _logger.LogDebug("OnModelCreating");
             
-            _logger.LogDebug("ApplyConfigurationFromInterfacedEntites by tenant");
-            modelBuilder.ApplyConfigurationFromInterfacedEntites(this, _tenant);  
-
             _logger.LogDebug("base.OnModelCreating");
-            base.OnModelCreating(modelBuilder);                      
+            base.OnModelCreating(modelBuilder); 
+
+            _logger.LogDebug("ApplyConfigurationFromInterfacedEntites by tenant");
+            modelBuilder.ApplyConfigurationFromInterfacedEntites(this, _tenant);                       
         }
     }
 }

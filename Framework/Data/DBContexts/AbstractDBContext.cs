@@ -26,7 +26,7 @@ namespace Framework.Data
 
         private void applyAuditToChangeTrackerEntries()
             => ChangeTracker.Entries()
-                .Where(e => ((e is IAuditable) &&
+                .Where(e => ((e.Entity is IAuditable) &&
                             (e.State == EntityState.Added || e.State == EntityState.Modified)))
                 .ToList()
                 .ForEach(entry => 
@@ -40,7 +40,7 @@ namespace Framework.Data
 
         private void applyDeletionToChangeTrackerEntries()
             => ChangeTracker.Entries()
-                .Where(e => (e is ISoftDeletable) && (e.State == EntityState.Deleted))
+                .Where(e => (e.Entity is ISoftDeletable) && (e.State == EntityState.Deleted))
                 .ToList()
                 .ForEach(item => 
                     {                        

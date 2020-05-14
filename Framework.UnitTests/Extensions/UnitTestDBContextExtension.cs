@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Configuration;
 
-namespace Framework.UnitTests
+namespace Framework.UnitTests.Exentions
 {
     public static class UnitTestDBContextExtension
     {

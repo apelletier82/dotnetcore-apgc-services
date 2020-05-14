@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using Framework.UnitTests.Data.DBContexts;
 using Framework.UnitTests.Entities;
+using Framework.UnitTests.Exentions;
 using Framework.UnitTests.Services;
 using Microsoft.Extensions.Logging;
 using Xunit;
@@ -56,7 +57,7 @@ namespace Framework.UnitTests
                     Assert.Equal(fte.Date, DateTime.Now.Date);
 
                     var res = await ftes.AddAsync(fte);
-                    Assert.NotEqual(res.Id, fte.Id);
+                    Assert.NotNull(res);
                 }
             }            
         }
