@@ -15,20 +15,26 @@ namespace Framework.UnitTests.Services
         public FullTestEntityService(DBContext dbContext) : base(dbContext)
         { }
 
-        public override FullTestEntity FindRowVersion(long id, byte[] rowVersion)
+        public override bool FindRowVersion(long id, byte[] rowVersion)
             =>  DBContext.FullTestEntities
-                    .Where(e => e.Id.Equals(id) && e.RowVersion.SequenceEqual(rowVersion))
-                    .SingleOrDefault();
+                    .Where(e => e.Id == id && e.RowVersion == rowVersion)
+                    .SingleOrDefault() != null;
 
-        public override async Task<FullTestEntity> FindRowVersionAsync(long id, byte[] rowVersion, CancellationToken cancellation = default)
+        public override bool FindRowVersion(FullTestEntity instance)
+            => FindRowVersion(instance.Id, instance.RowVersion);
+
+        public override async Task<bool> FindRowVersionAsync(long id, byte[] rowVersion, CancellationToken cancellationToken = default)
             => await DBContext.FullTestEntities
-                .Where(e => e.Id.Equals(id) && e.RowVersion.SequenceEqual(rowVersion))
-                .SingleOrDefaultAsync();            
-        
-        public override FullTestEntity Get(long id)
+                .Where(e => e.Id == id && e.RowVersion == rowVersion)
+                .SingleOrDefaultAsync(cancellationToken) != null;
+
+        public override async Task<bool> FindRowVersionAsync(FullTestEntity instance, CancellationToken cancellationToken = default)
+            => await FindRowVersionAsync(instance.Id, instance.RowVersion, cancellationToken);
+
+        public FullTestEntity Get(long id)
             => DBContext?.FullTestEntities.Find(id);
         
-        public override async Task<FullTestEntity> GetAsync(long id, CancellationToken cancellationToken = default)
+        public async Task<FullTestEntity> GetAsync(long id, CancellationToken cancellationToken = default)
             =>  DBContext != null ? await DBContext.FullTestEntities.FindAsync(id, cancellationToken) : null;
 
         public IEnumerable<FullTestEntity> GetList()
@@ -36,5 +42,11 @@ namespace Framework.UnitTests.Services
 
         public async Task<IEnumerable<FullTestEntity>> GetListAsync()
             => await DBContext?.FullTestEntities.ToListAsync();
+
+        public int? Count()
+            => DBContext?.FullTestEntities.Count();
+        
+        public async Task<int> CountAsync()
+            => await DBContext?.FullTestEntities.CountAsync();
     }
 }

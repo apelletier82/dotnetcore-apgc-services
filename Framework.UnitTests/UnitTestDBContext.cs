@@ -31,22 +31,19 @@ namespace Framework.UnitTests
         [Fact]
         public async void ReadFullTestEntities()
         {
-            using (LoggerFactory loggerFactory = this.CreateLoggerFactory())
-            {           
+            using (LoggerFactory loggerFactory = this.CreateLoggerFactory())       
                 using (DBContext db = this.CreateDbContext(loggerFactory))
                 {
                     FullTestEntityService ftes = new FullTestEntityService(db);
                     var lst = await ftes.GetListAsync();                
                     Assert.NotNull(lst);
-                }
-            }
+                }            
         }
 
         [Fact]
         public async void AddFullTestEntity()
         {
-            using (LoggerFactory loggerFactory = this.CreateLoggerFactory())
-            {           
+            using (LoggerFactory loggerFactory = this.CreateLoggerFactory())         
                 using (DBContext db = this.CreateDbContext(loggerFactory))
                 {
                     FullTestEntityService ftes =  new FullTestEntityService(db);                    
@@ -58,8 +55,22 @@ namespace Framework.UnitTests
 
                     var res = await ftes.AddAsync(fte);
                     Assert.NotNull(res);
+                }           
+        }
+
+        [Fact]
+        public async void UpdateOneFullTestEntity()
+        {
+            using (LoggerFactory loggerFactory = this.CreateLoggerFactory())         
+                using (DBContext db = this.CreateDbContext(loggerFactory))
+                {
+                    FullTestEntityService ftes = new FullTestEntityService(db);                    
+                    var fte = ftes.Get(1);
+                    if (fte != null)
+                        fte.UpdateName("Upate " + fte.Name);
+                    var res = await ftes.UpdateAsync(fte);
+                    Assert.False(res.RowVersion.SequenceEqual(fte.RowVersion));
                 }
-            }            
         }
     }
 }
