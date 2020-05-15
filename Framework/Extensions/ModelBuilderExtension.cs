@@ -1,4 +1,3 @@
-using System.Xml.Schema;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -30,33 +29,30 @@ namespace Framework.Extensions
             => ApplyConfigurationFromInterfacedEntites(modelBuilder, dbContext, null);
         
         public static void ApplyConfigurationFromInterfacedEntites(this ModelBuilder modelBuilder, DbContext dbContext, ITenant tenant)
-            => GetAllDBSets(dbContext)
+        {
+            var genApplyConfMethodType = modelBuilder.GetType().GetMethods()
+                                    .Where(m => m.IsGenericMethod && 
+                                                m.Name.Equals(getApplyConfigurationMethodName(), StringComparison.CurrentCultureIgnoreCase))
+                                    .FirstOrDefault();
+            GetAllDBSets(dbContext)
                 .Select(item => item.PropertyType.GetGenericArguments().FirstOrDefault())
                 .Where(item => item != null)
                 .ToList()
                 .ForEach(entityType => 
-                { 
-                    var genApplyConfMethodType = modelBuilder.GetType().GetMethods()
-                                    .Where(m => m.IsGenericMethod && 
-                                        m.Name.Equals(getApplyConfigurationMethodName(), StringComparison.CurrentCultureIgnoreCase))
-                                    .FirstOrDefault();  
-
-                    foreach(var interfaceType in entityType.GetInterfaces().Where(i => typeof(IEntity).IsAssignableFrom(i)))                                                                                                                
-                        if (tenant != null) 
-                        {
-                            if (interfaceType == typeof(ITenanciable))
-                            {
-                                var inst = EntityTypeConfigurationFactory.CreateNewTenanciableIntance(tenant, interfaceType, entityType);
-                                if (inst != null)
-                                    genApplyConfMethodType.MakeGenericMethod(entityType)?.Invoke(modelBuilder, new object[] { inst });
-                            }
-                        }
-                        else if (interfaceType != typeof(ITenanciable))
-                        {
-                            var inst = EntityTypeConfigurationFactory.CreateNewInstance(interfaceType, entityType);
-                            if (inst != null)
-                                genApplyConfMethodType.MakeGenericMethod(entityType)?.Invoke(modelBuilder, new object[] { inst });
-                        }
+                {
+                    foreach(var interfaceType in entityType.GetInterfaces().Where(i => typeof(IEntity).IsAssignableFrom(i)))  
+                    {   
+                        object inst = null;                                                                                                           
+                        
+                        if (tenant != null && interfaceType == typeof(ITenanciable))                                                   
+                            inst = EntityTypeConfigurationFactory.CreateNewTenanciableIntance(tenant, interfaceType, entityType);                        
+                        else if (tenant == null && interfaceType != typeof(ITenanciable))                        
+                            inst = EntityTypeConfigurationFactory.CreateNewInstance(interfaceType, entityType);
+                        
+                        if (inst != null)
+                            genApplyConfMethodType?.MakeGenericMethod(entityType)?.Invoke(modelBuilder, new object[] { inst });                        
+                    }
                 });
+        }
     }
 }

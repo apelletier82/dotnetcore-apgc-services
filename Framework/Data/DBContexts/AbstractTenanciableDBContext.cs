@@ -2,8 +2,6 @@ using Framework.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Framework.Extensions;
-using System.Linq;
-using Framework.Entities;
 
 namespace Framework.Data.DBContexts
 {
