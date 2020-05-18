@@ -8,9 +8,9 @@ namespace Framework.Data.EntityTypeConfigurations
         where TEntity : class, ISoftDeletable        
     {
         public void Configure(EntityTypeBuilder<TEntity> builder)
-        {
+        {            
             builder.OwnsOne(o => o.Deletion).Property(p => p.User).HasMaxLength(60);
-            builder.HasIndex(i => i.Deleted);            
+            builder.HasIndex(i => i.Deleted);                        
         }
     }
 }

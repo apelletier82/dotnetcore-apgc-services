@@ -37,11 +37,25 @@ namespace Framework.UnitTests.Services
         public async Task<FullTestEntity> GetAsync(long id, CancellationToken cancellationToken = default)
             =>  DBContext != null ? await DBContext.FullTestEntities.FindAsync(id, cancellationToken) : null;
 
-        public IEnumerable<FullTestEntity> GetList()
-            => DBContext?.FullTestEntities.ToList();
+        public IEnumerable<FullTestEntity> GetList(bool includeDeleted = false)
+            => DBContext?.FullTestEntities
+                .Where(e => (includeDeleted || e.Deleted == false))
+                .ToList();
 
-        public async Task<IEnumerable<FullTestEntity>> GetListAsync()
-            => await DBContext?.FullTestEntities.ToListAsync();
+        public IEnumerable<FullTestEntity> GetDeletedList()
+            => DBContext?.FullTestEntities
+                .Where(e => e.Deleted == true)
+                .ToList();
+
+        public async Task<IEnumerable<FullTestEntity>> GetListAsync(bool includeDeleted = false)
+            => await DBContext?.FullTestEntities
+                .Where(e => (includeDeleted || e.Deleted == false))
+                .ToListAsync();
+
+        public async Task<IEnumerable<FullTestEntity>> GetDeletedListAsync()
+            => await DBContext?.FullTestEntities
+                .Where(e => e.Deleted == true)
+                .ToListAsync();
 
         public int? Count()
             => DBContext?.FullTestEntities.Count();

@@ -1,6 +1,7 @@
 using System.Linq;
 using Framework.UnitTests.Data;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Metadata;
 
 namespace Framework.UnitTests.Extensions
@@ -20,8 +21,9 @@ namespace Framework.UnitTests.Extensions
 
                 foreach (var property in timestampProperties)
                 {
-                    property.SetValueConverter(new SqliteTimestampConverter()); 
-                    property.SetDefaultValueSql("CURRENT_TIMESTAMP");
+                    property.SetValueConverter(new SqliteTimestampConverter());
+                    //property.SetValueComparer(new ValueComparer<byte[]>(true)); 
+                    property.SetDefaultValueSql("CURRENT_TIMESTAMP");                    
                 }
             }            
         }

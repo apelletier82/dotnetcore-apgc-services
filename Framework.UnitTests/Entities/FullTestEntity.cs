@@ -19,12 +19,14 @@ namespace Framework.UnitTests.Entities
         public DateTime Date { get; private set; }
 
         private FullTestEntity()
-        { }
+        {  }
 
-        public FullTestEntity(ITenant tenant, string name, DateTime date)
+        public FullTestEntity(ITenant tenant, string name, DateTime date) 
+            :this()
         {            
             TenantID = tenant != null ? tenant.Id : 0;
             Deleted = false;
+
             Creation = new Audit();
             LastChange = new Audit();
             Deletion = new Audit();
@@ -51,6 +53,7 @@ namespace Framework.UnitTests.Entities
         public void Delete(string deletionUser)
         {
             Deleted = true;
+            Deletion ??= new Audit();
             Deletion.DoAudit(deletionUser);
         }
 

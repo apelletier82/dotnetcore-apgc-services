@@ -1,3 +1,7 @@
+using System.Runtime.CompilerServices;
+using System.Collections.Generic;
+using System.Transactions;
+using System.Security.AccessControl;
 using System.Linq;
 using System.Reflection;
 using Microsoft.EntityFrameworkCore;
@@ -7,6 +11,8 @@ using Microsoft.Extensions.Logging;
 using System.Threading.Tasks;
 using Framework.Extensions;
 using System.Threading;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
+using Framework.Entities.Owned;
 
 namespace Framework.Data
 {
@@ -25,42 +31,61 @@ namespace Framework.Data
         private void applyAuditToChangeTrackerEntries()
             => ChangeTracker.Entries()
                 .Where(e => ((e.Entity is IAuditable) &&
-                            (e.State == EntityState.Added || e.State == EntityState.Modified)))
-                .ToList()
-                .ForEach(entry => 
-                    {
-                        var ent = (IAuditable)entry.Entity;
-                        if (entry.State == EntityState.Added)                        
-                            ent.Creation.DoAudit(_identityUser.Username);                                       
-                        // log last change everytime 
-                        ent.LastChange.DoAudit(_identityUser.Username);
-                    });                                                        
+                            (e.State == EntityState.Added || e.State == EntityState.Modified )))                
+                .ToList()               
+                .ForEach(item => 
+                    {                                                
+                        if (item.State == EntityState.Added)                        
+                            ((IAuditable)item.Entity).Creation.DoAudit(_identityUser.Username);                                      
+                        
+                        // log last change everytime (on every change)                        
+                        ((IAuditable)item.Entity).LastChange.DoAudit(_identityUser.Username);
+                    });                                                                              
 
-        private void applyDeletionToChangeTrackerEntries()
-            => ChangeTracker.Entries()
-                .Where(e => (e.Entity is ISoftDeletable) && (e.State == EntityState.Deleted))
+        private void applySoftDeleteToChangeTrackerEntries()
+        {  
+            IList<EntityEntry> softDeletedEntites = new List<EntityEntry>();
+
+            // if entity was already "soft" deleted : do nothing: just let delete it definitively
+            ChangeTracker.Entries()
+                .Where(e => e.State == EntityState.Deleted && e.Entity is ISoftDeletable && ((ISoftDeletable)e.Entity).Deleted == false)
                 .ToList()
                 .ForEach(item => 
-                    {                        
-                        ((ISoftDeletable)item.Entity).Delete(_identityUser.Username);
-                        item.State = EntityState.Modified; 
-                    });                         
+                {
+                    item.State = EntityState.Modified; 
+                    ((ISoftDeletable)item.Entity).Delete(_identityUser.Username);                                         
+                    softDeletedEntites.Add(item);                                                                                                                         
+                });  
 
-        private void applyModificationToChangeTrackerEntities()
-        {
-            applyDeletionToChangeTrackerEntries();
-            applyAuditToChangeTrackerEntries();                
+            // Synchronize owned "entities" EntityState with owner's EntityState
+            if (softDeletedEntites.Any())
+                ChangeTracker.Entries()
+                    .Where(e => e.State == EntityState.Deleted && e.Entity is Audit)
+                    .ToList()
+                    .ForEach(item => 
+                    {
+                        var owner = (softDeletedEntites
+                                    .Where(e => ((ISoftDeletable)e.Entity).Deletion == item.Entity || 
+                                                ((IAuditable)e.Entity).Creation == item.Entity || 
+                                                ((IAuditable)e.Entity).LastChange == item.Entity))
+                                    .FirstOrDefault();
+
+                        if (owner != null)
+                            item.State = owner.State;
+                    });
         }
 
         public override int SaveChanges(bool acceptAllChangesOnSuccess)
         {
-            applyModificationToChangeTrackerEntities();        
+            applySoftDeleteToChangeTrackerEntries();            
+            applyAuditToChangeTrackerEntries();                    
             return base.SaveChanges(acceptAllChangesOnSuccess);
         }
 
         public override async Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess, CancellationToken cancellationToken = default(CancellationToken))
-        {   
-            applyModificationToChangeTrackerEntities();
+        {               
+            applySoftDeleteToChangeTrackerEntries();              
+            applyAuditToChangeTrackerEntries();                      
             return await base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken);
         }
 

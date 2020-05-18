@@ -1,3 +1,4 @@
+using System.Linq;
 using Framework.Models;
 using Framework.UnitTests.Data.DBContexts;
 using Framework.UnitTests.Models;
@@ -21,39 +22,45 @@ namespace Framework.UnitTests.Exentions
                                         .Build();                                
         }
 
-        private static DbContextOptions<DBContext> CreateSQLiteDBContextOptions()
+        private static DbContextOptions<DBContext> CreateSQLiteDBContextOptions(ILoggerFactory loggerFactory)
             => new DbContextOptionsBuilder<DBContext>()
                 .UseSqlite(Configuration.GetConnectionString("Default") ?? SQLITE_CONNECTIONSTRING_DEFAUTL)
+                .UseLoggerFactory(loggerFactory)
+                .EnableDetailedErrors()
+                .EnableSensitiveDataLogging()                
                 .Options;
 
-        private static DbContextOptions<TenantDBContext> CreateSQLiteTenantDBContextOptions()
+        private static DbContextOptions<TenantDBContext> CreateSQLiteTenantDBContextOptions(ILoggerFactory loggerFactory)
             => new DbContextOptionsBuilder<TenantDBContext>()
                 .UseSqlite(Configuration.GetConnectionString("Tenant") ?? SQLITE_CONNECTIONSTRING_TENANT)
+                .UseLoggerFactory(loggerFactory)
+                .EnableDetailedErrors()
+                .EnableSensitiveDataLogging()                
                 .Options;
         
         private static IIdentityUser CreateIdentityUser()
             => new TestIdentityUser(); 
 
-        public static LoggerFactory CreateLoggerFactory(this UnitTestDBContext unitTestDBContext)
-            => new LoggerFactory();
+        public static ILoggerFactory CreateLoggerFactory(this UnitTestDBContext unitTestDBContext)
+            => LoggerFactory.Create(builder => builder.AddConsole());
 
-        public static TenantDBContext CreateTenantDBContext(this UnitTestDBContext unitTestDBContext, LoggerFactory loggerFactory)
+        public static TenantDBContext CreateTenantDBContext(this UnitTestDBContext unitTestDBContext, ILoggerFactory loggerFactory)
         {
-            var result = new TenantDBContext(CreateSQLiteTenantDBContextOptions(), CreateIdentityUser(), loggerFactory);
+            var result = new TenantDBContext(CreateSQLiteTenantDBContextOptions(loggerFactory), CreateIdentityUser(), loggerFactory);
             result.Database.EnsureCreated();
             return result;
         }
 
-        public static TenantEntityReadOnlyService CreateTenantEntityReadOnlyService(this UnitTestDBContext unitTestDBContext, LoggerFactory loggerFactory)
+        public static TenantEntityReadOnlyService CreateTenantEntityReadOnlyService(this UnitTestDBContext unitTestDBContext, ILoggerFactory loggerFactory)
             => new TenantEntityReadOnlyService(CreateTenantDBContext(unitTestDBContext, loggerFactory));
 
-        public static ITenant CreateLocalHostTenant(this UnitTestDBContext unitTestDBContext, LoggerFactory loggerFactory)
+        public static ITenant CreateLocalHostTenant(this UnitTestDBContext unitTestDBContext, ILoggerFactory loggerFactory)
             => new Tenant(CreateTenantEntityReadOnlyService(unitTestDBContext, loggerFactory), "localhost");
 
-        public static DBContext CreateDbContext(this UnitTestDBContext unitTestDBContext, LoggerFactory loggerFactory)
+        public static DBContext CreateDbContext(this UnitTestDBContext unitTestDBContext, ILoggerFactory loggerFactory)
         {
-            var result = new DBContext(CreateSQLiteDBContextOptions(), CreateLocalHostTenant(unitTestDBContext, loggerFactory), CreateIdentityUser(), loggerFactory);
-            result.Database.EnsureCreated();
+            var result = new DBContext(CreateSQLiteDBContextOptions(loggerFactory), CreateLocalHostTenant(unitTestDBContext, loggerFactory), CreateIdentityUser(), loggerFactory);
+            result.Database.EnsureCreated();                        
             return result;
         }
     }

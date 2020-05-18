@@ -3,12 +3,12 @@ using System;
 namespace Framework.Entities.Owned
 {
     public class Audit
-    {
-        public String User { get; private set; }
+    {                
+        public string User { get; private set; } = "";
         public DateTimeOffset? Date { get; private set; }
         
         public virtual void DoAudit(string auditUser)
-        {
+        {            
             User = auditUser;
             Date = DateTimeOffset.Now;
         }
