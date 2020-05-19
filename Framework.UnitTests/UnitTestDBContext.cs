@@ -70,8 +70,7 @@ namespace Framework.UnitTests
                 }
             }                
         }
-
-        [Fact]
+        
         [Theory]
         [InlineData(1)]
         [InlineData(2)]
@@ -86,13 +85,11 @@ namespace Framework.UnitTests
                     var fte = await ftes.GetAsync(id);
                     Assert.NotNull(fte);
                     fte.UpdateName(fte.Name + "-");
-                    var res = await ftes.UpdateAsync(fte);
-                    Assert.False(res.RowVersion.SequenceEqual(fte.RowVersion));
+                    var res = await ftes.UpdateAsync(fte);                                       
                 }
             }
         }
-
-        [Fact]
+        
         [Theory]
         [InlineData(1)]
         [InlineData(2)]
@@ -106,13 +103,11 @@ namespace Framework.UnitTests
                     FullTestEntityService ftes = new FullTestEntityService(db);                                                         
                     var fte = await ftes.GetAsync(id);
                     Assert.NotNull(fte);
-                    var res = await ftes.DeleteAsync(fte);
-                    Assert.True(res);
+                    Assert.True(await ftes.DeleteAsync(fte));                    
                 }
             }
         }
-
-        [Fact]
+        
         [Theory]
         [InlineData(1)]
         [InlineData(2)]
@@ -127,8 +122,8 @@ namespace Framework.UnitTests
                     var fte = await ftes.GetAsync(id);
                     Assert.NotNull(fte);
                     fte.Restore();
-                    var res = ftes.Update(fte);
-                    Assert.False(fte.Deleted);
+                    var res = await ftes.UpdateAsync(fte);
+                    Assert.False(res.Deleted);
                 }
             }
         }

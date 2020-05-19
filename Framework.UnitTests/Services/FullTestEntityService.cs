@@ -35,7 +35,9 @@ namespace Framework.UnitTests.Services
             => DBContext?.FullTestEntities.Find(id);
         
         public async Task<FullTestEntity> GetAsync(long id, CancellationToken cancellationToken = default)
-            =>  DBContext != null ? await DBContext.FullTestEntities.FindAsync(id, cancellationToken) : null;
+            =>  DBContext != null 
+                ? await DBContext.FullTestEntities.FindAsync(new object[] { id }, cancellationToken) 
+                : null;
 
         public IEnumerable<FullTestEntity> GetList(bool includeDeleted = false)
             => DBContext?.FullTestEntities
