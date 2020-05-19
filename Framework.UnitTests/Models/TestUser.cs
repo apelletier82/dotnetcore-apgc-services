@@ -5,7 +5,7 @@ namespace Framework.UnitTests.Models
 {
     public class TestIdentityUser : IIdentityUser
     {
-        private const string USER_NAME = "xUnitUserTest";
+        private static string defaultTestUsername { get; set; } = "xUnitUserTest";
         public string Username { get; private set; }
 
         public TestIdentityUser()
@@ -16,7 +16,7 @@ namespace Framework.UnitTests.Models
                         .AddJsonFile("settings.json", true)
                         .Build();
 
-            Username = conf["Username"] ?? USER_NAME;
-        }                    
+            Username = conf["Username"] ?? defaultTestUsername;
+        }
     }
 }

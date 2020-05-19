@@ -9,18 +9,18 @@ namespace Framework.Extensions
 {
     public static class ModelBuilderExtension
     {
-        private const string CST_ApplyConfigurationMethod = "ApplyConfiguration";
+        private static string applyConfigurationMethodName { get; set; } = "ApplyConfiguration";
 
         private static string getApplyConfigurationMethodName()
-            => CST_ApplyConfigurationMethod;
+            => applyConfigurationMethodName;
 
         public static void ApplyConfigurationFromInterfacedEntites(this ModelBuilder modelBuilder, DbContext dbContext)
             => ApplyConfigurationFromInterfacedEntites(modelBuilder, dbContext, null);
-        
+
         public static void ApplyConfigurationFromInterfacedEntites(this ModelBuilder modelBuilder, DbContext dbContext, ITenant tenant)
         {
             var genApplyConfMethodType = modelBuilder.GetType().GetMethods()
-                                    .Where(m => m.IsGenericMethod && 
+                                    .Where(m => m.IsGenericMethod &&
                                                 m.Name.Equals(getApplyConfigurationMethodName(), StringComparison.CurrentCultureIgnoreCase))
                                     .FirstOrDefault();
 
@@ -28,18 +28,18 @@ namespace Framework.Extensions
                 .Where(e => e.ClrType != null)
                 .Select(e => e.ClrType)
                 .ToList()
-                .ForEach(entityType => 
+                .ForEach(entityType =>
                 {
-                    var genericMethod = genApplyConfMethodType?.MakeGenericMethod(entityType); 
-                    if (tenant == null)                    
-                        foreach(var interfaceType in entityType.GetInterfaces().Where(i => typeof(IEntity).IsAssignableFrom(i) &&  i != typeof(ITenanciable)))
+                    var genericMethod = genApplyConfMethodType?.MakeGenericMethod(entityType);
+                    if (tenant == null)
+                        foreach (var interfaceType in entityType.GetInterfaces().Where(i => typeof(IEntity).IsAssignableFrom(i) && i != typeof(ITenanciable)))
                         {
                             var inst = EntityTypeConfigurationFactory.CreateNewInstance(interfaceType, entityType);
-                            if (inst != null)                            
+                            if (inst != null)
                                 genericMethod?.Invoke(modelBuilder, new object[] { inst });
                         }
                     else
-                        foreach(var interfaceType in entityType.GetInterfaces().Where(i => typeof(IEntity).IsAssignableFrom(i) &&  i == typeof(ITenanciable))) 
+                        foreach (var interfaceType in entityType.GetInterfaces().Where(i => typeof(IEntity).IsAssignableFrom(i) && i == typeof(ITenanciable)))
                             genericMethod?.Invoke(modelBuilder, new object[] { EntityTypeConfigurationFactory.CreateNewTenanciableIntance(tenant, interfaceType, entityType) });
                 });
         }

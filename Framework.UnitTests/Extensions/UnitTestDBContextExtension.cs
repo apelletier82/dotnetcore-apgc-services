@@ -1,4 +1,3 @@
-using System.Linq;
 using Framework.Models;
 using Framework.UnitTests.Data.DBContexts;
 using Framework.UnitTests.Models;
@@ -11,35 +10,35 @@ namespace Framework.UnitTests.Exentions
 {
     public static class UnitTestDBContextExtension
     {
-        private const string SQLITE_CONNECTIONSTRING_DEFAUTL = "Data Source=UnitTestDBContext.db;";
-        private const string SQLITE_CONNECTIONSTRING_TENANT = "Data Source=UnitTestTenantDBContext.db;";
-        
+        private static string sqLiteConnectionStringDefault { get; set; } = "Data Source=UnitTestDBContext.db;";
+        private static string sqLiteConnectionStringTenant { get; set; } = "Data Source=UnitTestTenantDBContext.db;";
+
         private static IConfigurationRoot _configuration;
         private static IConfigurationRoot Configuration
         {
             get => _configuration ??= new ConfigurationBuilder()
                                         .AddJsonFile("settings.json", true)
-                                        .Build();                                
+                                        .Build();
         }
 
         private static DbContextOptions<DBContext> CreateSQLiteDBContextOptions(ILoggerFactory loggerFactory)
             => new DbContextOptionsBuilder<DBContext>()
-                .UseSqlite(Configuration.GetConnectionString("Default") ?? SQLITE_CONNECTIONSTRING_DEFAUTL)
+                .UseSqlite(Configuration.GetConnectionString("Default") ?? sqLiteConnectionStringDefault)
                 .UseLoggerFactory(loggerFactory)
                 .EnableDetailedErrors()
-                .EnableSensitiveDataLogging()                
+                .EnableSensitiveDataLogging()
                 .Options;
 
         private static DbContextOptions<TenantDBContext> CreateSQLiteTenantDBContextOptions(ILoggerFactory loggerFactory)
             => new DbContextOptionsBuilder<TenantDBContext>()
-                .UseSqlite(Configuration.GetConnectionString("Tenant") ?? SQLITE_CONNECTIONSTRING_TENANT)
+                .UseSqlite(Configuration.GetConnectionString("Tenant") ?? sqLiteConnectionStringTenant)
                 .UseLoggerFactory(loggerFactory)
                 .EnableDetailedErrors()
-                .EnableSensitiveDataLogging()                
+                .EnableSensitiveDataLogging()
                 .Options;
-        
+
         private static IIdentityUser CreateIdentityUser()
-            => new TestIdentityUser(); 
+            => new TestIdentityUser();
 
         public static ILoggerFactory CreateLoggerFactory(this UnitTestDBContext unitTestDBContext)
             => LoggerFactory.Create(builder => builder.AddConsole());
@@ -60,7 +59,7 @@ namespace Framework.UnitTests.Exentions
         public static DBContext CreateDbContext(this UnitTestDBContext unitTestDBContext, ILoggerFactory loggerFactory)
         {
             var result = new DBContext(CreateSQLiteDBContextOptions(loggerFactory), CreateLocalHostTenant(unitTestDBContext, loggerFactory), CreateIdentityUser(), loggerFactory);
-            result.Database.EnsureCreated();                        
+            result.Database.EnsureCreated();
             return result;
         }
     }
