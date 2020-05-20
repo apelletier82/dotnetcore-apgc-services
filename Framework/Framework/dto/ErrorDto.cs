@@ -1,6 +1,6 @@
 using System;
 
-namespace Framework.Api.dto
+namespace Framework.dto
 {
     public class ErrorDto
     {
