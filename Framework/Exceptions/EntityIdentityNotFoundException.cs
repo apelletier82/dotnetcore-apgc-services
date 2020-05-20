@@ -6,9 +6,6 @@ namespace Framework.Exceptions
     {
         public long Id { get; private set; }
 
-        public EntityIdentityNotFoundException(): this(0)
-        { }
-
         public EntityIdentityNotFoundException(long id): this(id, "")
         { }
 
